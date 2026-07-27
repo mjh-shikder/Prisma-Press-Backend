@@ -56,8 +56,11 @@ app.post("/api/users/register", async (req: Request, res: Response) => {
             id: createdUser.id,
             email: createdUser.email || email 
         },
+        omit: {
+            password: true
+        },
         include: {
-            profileId: true
+            profile: true
         }
     })
 
