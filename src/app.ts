@@ -6,6 +6,7 @@ import { prisma } from "./lib/prisma";
 import  httpStatus  from "http-status";
 import bcrypt from "bcryptjs";
 import { userRouter } from "./modules/users/user.route";
+import { authRoutes } from "./modules/auth/auth.routes";
 
 const app: Application = express();
 
@@ -23,7 +24,7 @@ app.use(cookieParser())
 
 
 app.use("/api/user", userRouter)
-
+app.use("/api/auth", authRoutes)
 
 app.get("/", async (req: Request, res: Response) => {    
     res.send("Hellow, workd")
