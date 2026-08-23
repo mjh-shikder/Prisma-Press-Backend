@@ -59,13 +59,9 @@ const registerUserIntoDB = async (payload: RegisterUserPayload) => {
 
 
 const getMyProfileFromDB = async (userId: string) => {
-    const user = await prisma.user.findUnique({
-        where: {  
-            id: userId
-        },
-        omit: {
-            password: true,
-        },
+    const user = await prisma.user.findUniqueOrThrow({
+        where: { id: userId },
+        omit: { password: true, },
         include: {
             profile: true,
         },
