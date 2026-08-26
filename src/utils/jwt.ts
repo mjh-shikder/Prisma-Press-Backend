@@ -12,12 +12,18 @@ const createToken = (payload: JwtPayload, secret: string, expiresIn: SignOptions
 const verifiyToken = (token: string, secret: string) => {
    try {
      const verifyingToken = jwt.verify(token, secret);
-     return verifyingToken;
+       return {
+           success: true,
+           data: verifyingToken
+       };
 
    } catch (error: any) {
        console.log(error);
        
-       throw new Error(error.message);
+         return {
+           success: false,
+           error: error.message
+         }
    }
 }
 
