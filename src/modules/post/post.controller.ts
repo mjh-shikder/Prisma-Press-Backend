@@ -52,18 +52,51 @@ const getPostById = catchAsync(async (req: Request, res: Response, next: NextFun
 })
 
 
+const getMyPosts = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
+
+    const authorId = req.user?.id
+
+    const result = await postService.getMyPosts(authorId as string)
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "My Posts retrieved successfully",
+        data: result
+    })
+    
+    
+})
+
+
+
+const updatePost = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
+const authorId = req.user?.id
+const isAdmin = req.user?.role === "ADMIN"
+const postId = req.params.postId
+    const payload = req.body
+    
+    const result = await postService.updatePost(postId as string, payload, authorId as string, isAdmin, )
+   
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Post updated successfully",
+        data: result
+    })
+
+
+
+
+})
+
+
+
 const getPostsStatus = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
 
 })
 
-const getMyPosts = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
-
-})
 
 
-const updatePost = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
-
-})
 
 const deletePost = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
 
