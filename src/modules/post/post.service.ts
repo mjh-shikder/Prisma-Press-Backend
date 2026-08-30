@@ -100,7 +100,7 @@ const updatePost = async (
     },
   });
 
-  if (post.authorId !== authorId && !isAdmin) {
+  if (!isAdmin && post.authorId !== authorId ) {
     throw new Error("You are not authorized to update this post");
   }
 
@@ -124,7 +124,28 @@ const updatePost = async (
   return result;
 };
 
-const deletePost = () => {};
+
+const deletePost = async (postId: string, authorId: string, isAdmin: boolean) => {
+  const post = await prisma.post.findUniqueOrThrow({
+    where: {
+      id: postId,
+    },
+  });
+  
+
+    if (!isAdmin && post.authorId !== authorId ) {
+    throw new Error("You are not authorized to update this post");
+  }
+
+  const result = await prisma.post.delete({
+    where: {
+      id: postId,
+    },
+  });
+
+  return result;
+
+};
 
 const getPostsStatus = () => {};
 

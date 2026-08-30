@@ -91,16 +91,37 @@ const postId = req.params.postId
 
 
 
+const deletePost = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
+
+const authorId = req.user?.id;
+const isAdmin = req.user?.role === "ADMIN";
+const postId = req.params.postId;
+
+       if (!postId) {
+         throw new Error("Post ID is required");
+       }
+
+const result = await postService.deletePost(
+  postId as string,
+  authorId as string,
+  isAdmin,
+);
+
+sendResponse(res, {
+  success: true,
+  statusCode: httpStatus.OK,
+  message: "Post deleted successfully",
+  data: result,
+});
+
+})
+
+
+
 const getPostsStatus = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
 
 })
 
-
-
-
-const deletePost = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
-
-})
 
 export const postController = {
     createPost,
