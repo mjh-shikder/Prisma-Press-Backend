@@ -1,3 +1,4 @@
+import { CommentStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { ICreatePostPayload, IUpdatePostPayload } from "./post.interface";
 
@@ -30,32 +31,47 @@ const getAllPosts = async () => {
 };
 
 const getPostsById = async (postId: string) => {
-  const post = await prisma.post.findUniqueOrThrow({
-    where: {
-      id: postId,
-    },
-  });
-
-  const updatedPost = await prisma.post.update({
+  await prisma.post.update({
     where: {
       id: postId,
     },
     data: {
       views: { increment: 1 },
     },
+  });
+
+  // throw new Error("Fake error to test Sentry integration");
+
+  const post = await prisma.post.findUniqueOrThrow({
+    where: {
+      id: postId,
+    },
     include: {
       author: {
         omit: {
           password: true,
-          createdAT: true,
-          updatedAt: true,
         },
       },
-      comments: true,
+
+      comments: {
+        where: {
+          status: CommentStatus.APPROVED,
+        },
+
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
     },
   });
 
-  return updatedPost;
+  return post;
+
 };
 
 const getMyPosts = async (authorId: string) => {
@@ -100,7 +116,7 @@ const updatePost = async (
     },
   });
 
-  if (!isAdmin && post.authorId !== authorId ) {
+  if (!isAdmin && post.authorId !== authorId) {
     throw new Error("You are not authorized to update this post");
   }
 
@@ -124,27 +140,26 @@ const updatePost = async (
   return result;
 };
 
-
-const deletePost = async (postId: string, authorId: string, isAdmin: boolean) => {
+const deletePost = async (
+  postId: string,
+  authorId: string,
+  isAdmin: boolean,
+) => {
   const post = await prisma.post.findUniqueOrThrow({
     where: {
       id: postId,
     },
   });
-  
 
-    if (!isAdmin && post.authorId !== authorId ) {
+  if (!isAdmin && post.authorId !== authorId) {
     throw new Error("You are not authorized to update this post");
   }
 
-  const result = await prisma.post.delete({
+  await prisma.post.delete({
     where: {
       id: postId,
     },
   });
-
-  return result;
-
 };
 
 const getPostsStatus = () => {};

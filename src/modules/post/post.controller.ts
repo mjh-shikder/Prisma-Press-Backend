@@ -101,7 +101,7 @@ const postId = req.params.postId;
          throw new Error("Post ID is required");
        }
 
-const result = await postService.deletePost(
+  await postService.deletePost(
   postId as string,
   authorId as string,
   isAdmin,
@@ -111,7 +111,7 @@ sendResponse(res, {
   success: true,
   statusCode: httpStatus.OK,
   message: "Post deleted successfully",
-  data: result,
+  data: null,
 });
 
 })
