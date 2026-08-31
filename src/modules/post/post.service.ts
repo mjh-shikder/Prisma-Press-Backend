@@ -31,49 +31,99 @@ const getAllPosts = async () => {
 };
 
 const getPostsById = async (postId: string) => {
-  await prisma.post.update({
-    where: {
-      id: postId,
-    },
-    data: {
-      views: { increment: 1 },
-    },
-  });
+  // await prisma.post.update({
+  //   where: {
+  //     id: postId,
+  //   },
+  //   data: {
+  //     views: { increment: 1 },
+  //   },
+  // });
 
   // throw new Error("Fake error to test Sentry integration");
 
-  const post = await prisma.post.findUniqueOrThrow({
-    where: {
-      id: postId,
-    },
-    include: {
-      author: {
-        omit: {
-          password: true,
-        },
-      },
+  // const post = await prisma.post.findUniqueOrThrow({
+  //   where: {
+  //     id: postId,
+  //   },
+  //   include: {
+  //     author: {
+  //       omit: {
+  //         password: true,
+  //       },
+  //     },
 
-      comments: {
+  //     comments: {
+  //       where: {
+  //         status: CommentStatus.APPROVED,
+  //       },
+
+  //       orderBy: {
+  //         createdAt: "desc",
+  //       },
+  //     },
+  //     _count: {
+  //       select: {
+  //         comments: true,
+  //       },
+  //     },
+  //   },
+  // });
+
+  // return post;
+
+  const transactionResult = await prisma.$transaction(
+    async (tx) => {
+      await tx.post.update({
         where: {
-          status: CommentStatus.APPROVED,
+          id: postId,
         },
+        data: {
+          views: { increment: 1 },
+        },
+      });
 
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
-      _count: {
-        select: {
-          comments: true,
-        },
-      },
-    },
-  });
+      // ! Fake error
+      // throw new Error("Fake error to test rollback")
 
-  return post;
+      const post = await tx.post.findUniqueOrThrow({
+        where: {
+          id: postId,
+        },
+        include: {
+          author: {
+            omit: {
+              password: true,
+            },
+          },
+
+          comments: {
+            where: {
+              status: CommentStatus.APPROVED,
+            },
+
+            orderBy: {
+              createdAt: "desc",
+            },
+          },
+          _count: {
+            select: {
+              comments: true,
+            },
+          },
+        },
+      });
+
+      return post
+
+    }
+  );
+
+  return transactionResult
 
 };
 
+//* Get My Posts
 const getMyPosts = async (authorId: string) => {
   const result = await prisma.post.findMany({
     where: {
