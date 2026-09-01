@@ -4,131 +4,132 @@ import { postService } from "./post.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
 
+const createPost = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.user?.id;
 
-const createPost = catchAsync(async (req: Request, res: Response, next: NextFunction)=> { 
-    const id = req.user?.id
+    const payload = req.body;
 
-    const payload = req.body
-
-    const result = await postService.createPost(payload, id as string)
-
-    sendResponse(res, {
-        success: true,
-        statusCode: httpStatus.CREATED,
-        message: "Post created successfully",
-        data: result
-    })
-
-})
-
-
-const getAllPosts = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
-    const result = await postService.getAllPosts()
+    const result = await postService.createPost(payload, id as string);
 
     sendResponse(res, {
-        success: true,
-        statusCode: httpStatus.OK,
-        message: "Posts retrieved successfully",
-        data: result
-    })
-})
-
-
-const getPostById = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
-    const postId = req.params.postId;
-
-    if(!postId) {
-        throw new Error("Post ID is required")
-    }
-
-    const result = await postService.getPostsById(postId as string)
-    
-    sendResponse(res, {
-        success: true,
-        statusCode: httpStatus.OK,
-        message: "Post retrieved successfully",
-        data: result
-    })
-})
-
-
-const getMyPosts = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
-
-    const authorId = req.user?.id
-
-    const result = await postService.getMyPosts(authorId as string)
-    sendResponse(res, {
-        success: true,
-        statusCode: httpStatus.OK,
-        message: "My Posts retrieved successfully",
-        data: result
-    })
-    
-    
-})
-
-
-
-const updatePost = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
-const authorId = req.user?.id
-const isAdmin = req.user?.role === "ADMIN"
-const postId = req.params.postId
-    const payload = req.body
-    
-    const result = await postService.updatePost(postId as string, payload, authorId as string, isAdmin, )
-   
-    sendResponse(res, {
-        success: true,
-        statusCode: httpStatus.OK,
-        message: "Post updated successfully",
-        data: result
-    })
-
-
-
-
-})
-
-
-
-const deletePost = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
-
-const authorId = req.user?.id;
-const isAdmin = req.user?.role === "ADMIN";
-const postId = req.params.postId;
-
-       if (!postId) {
-         throw new Error("Post ID is required");
-       }
-
-  await postService.deletePost(
-  postId as string,
-  authorId as string,
-  isAdmin,
+      success: true,
+      statusCode: httpStatus.CREATED,
+      message: "Post created successfully",
+      data: result,
+    });
+  },
 );
 
-sendResponse(res, {
-  success: true,
-  statusCode: httpStatus.OK,
-  message: "Post deleted successfully",
-  data: null,
-});
+const getAllPosts = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await postService.getAllPosts();
 
-})
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Posts retrieved successfully",
+      data: result,
+    });
+  },
+);
 
+const getPostById = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const postId = req.params.postId;
 
+    if (!postId) {
+      throw new Error("Post ID is required");
+    }
 
-const getPostsStatus = catchAsync(async (req: Request, res: Response, next: NextFunction) => { 
+    const result = await postService.getPostsById(postId as string);
 
-})
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Post retrieved successfully",
+      data: result,
+    });
+  },
+);
 
+const getMyPosts = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const authorId = req.user?.id;
+
+    const result = await postService.getMyPosts(authorId as string);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "My Posts retrieved successfully",
+      data: result,
+    });
+  },
+);
+
+const updatePost = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const authorId = req.user?.id;
+    const isAdmin = req.user?.role === "ADMIN";
+    const postId = req.params.postId;
+    const payload = req.body;
+
+    const result = await postService.updatePost(
+      postId as string,
+      payload,
+      authorId as string,
+      isAdmin,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Post updated successfully",
+      data: result,
+    });
+  },
+);
+
+const deletePost = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const authorId = req.user?.id;
+    const isAdmin = req.user?.role === "ADMIN";
+    const postId = req.params.postId;
+
+    if (!postId) {
+      throw new Error("Post ID is required");
+    }
+
+    await postService.deletePost(postId as string, authorId as string, isAdmin);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Post deleted successfully",
+      data: null,
+    });
+  },
+);
+
+const getPostsStatus = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await postService.getPostsStatus();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Posts status retrieved successfully",
+      data: result,
+    });
+  },
+);
 
 export const postController = {
-    createPost,
-    getAllPosts,
-    getPostsStatus,
-    getMyPosts,
-    getPostById,
-    updatePost,
-    deletePost
-}
+  createPost,
+  getAllPosts,
+  getPostsStatus,
+  getMyPosts,
+  getPostById,
+  updatePost,
+  deletePost,
+};
