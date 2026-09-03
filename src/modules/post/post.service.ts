@@ -1,3 +1,4 @@
+import { title } from "node:process";
 import { CommentStatus, PostStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { ICreatePostPayload, IUpdatePostPayload } from "./post.interface";
@@ -15,8 +16,7 @@ const createPost = async (payload: ICreatePostPayload, userId: string) => {
 
 const getAllPosts = async () => {
   const posts = await prisma.post.findMany({
-
-    //? Filtering or Exact match 
+    //? Filtering or Exact match
     // where: {
     //   title: "My 4th Post",
     //   content: "Dhaka",
@@ -29,7 +29,7 @@ const getAllPosts = async () => {
     //     },
     //     {
     //       // coontent: "Dhaka"
-    //     }, 
+    //     },
     //     {
     //       tags: {
     //         equals: ["typescript", "prisma", "express"],
@@ -37,7 +37,7 @@ const getAllPosts = async () => {
     //     }
     //   ]
     // },
-    
+
     //? Searching or Partial match
 
     // where: {
@@ -46,28 +46,60 @@ const getAllPosts = async () => {
     //     mode: "insensitive"
     //   },
     //* Not Ideal for parital match. Partial match e por por 2 ta feild diya dile oy AND Operator er moto kaj korbe. So, better to use OR operator for partial match.
-      // content: {
-      //   contains: "dhaka",
-      //   mode: "insensitive"
-      // }
+    // content: {
+    //   contains: "dhaka",
+    //   mode: "insensitive"
+    // }
     // },
-    
+
+    //? Searching or Partial match with OR operator
+    // where: {
+    //   OR: [
+    //     {
+    //       title: {
+    //         contains: "dhaka",
+    //         mode: "insensitive"}
+    //     },
+    //     {
+    //       content: {
+    //         contains: "dhaka",
+    //         mode: "insensitive"
+    //       }
+    //     }
+    //   ]
+    // },
+
+    //?Searching Partial (OR) and Exact match (AND) together
     where: {
-      OR: [
+      //? Filtering or Exact match
+      AND: [
         {
-          title: {
-            contains: "dhaka",
-            mode: "insensitive"}
+          //? Searching or Partial match with OR operator
+          OR: [
+            {
+              title: {
+                contains: "dhaka",
+                mode: "insensitive"
+              },
+            },
+            {
+              content: {
+                contains: "dhaka",
+                mode: "insensitive"
+              },
+            },
+          ],
+        },
+        //? Filtering or Exact match
+        {
+          title: "dhaka",
         },
         {
-          content: {
-            contains: "dhaka",
-            mode: "insensitive"
-          }
-        }
-      ]
+          content: "dhaka",
+        },
+      ],
     },
-    
+
     include: {
       author: {
         omit: {
@@ -372,7 +404,7 @@ const getPostsStatus = async () => {
         },
       }),
     ]);
-     return {
+    return {
       totalPost,
       totalPublishedPost,
       totalDraftPost,
@@ -380,8 +412,8 @@ const getPostsStatus = async () => {
       totalComments,
       totalApprovedComment,
       totalRejectedComment,
-      totalPostViews : totalPostViews._sum.views
-    }
+      totalPostViews: totalPostViews._sum.views,
+    };
   });
 
   return transactionResult;
