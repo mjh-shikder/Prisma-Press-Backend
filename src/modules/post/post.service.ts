@@ -70,34 +70,47 @@ const getAllPosts = async () => {
     // },
 
     //?Searching Partial (OR) and Exact match (AND) together
-    where: {
-      //? Filtering or Exact match
-      AND: [
-        {
-          //? Searching or Partial match with OR operator
-          OR: [
-            {
-              title: {
-                contains: "dhaka",
-                mode: "insensitive"
-              },
-            },
-            {
-              content: {
-                contains: "dhaka",
-                mode: "insensitive"
-              },
-            },
-          ],
-        },
-        //? Filtering or Exact match
-        {
-          title: "dhaka",
-        },
-        {
-          content: "dhaka",
-        },
-      ],
+    // where: {
+    //   //? Filtering or Exact match
+    //   AND: [
+    //     {
+    //       //? Searching or Partial match with OR operator
+    //       OR: [
+    //         {
+    //           title: {
+    //             contains: "dhaka",
+    //             mode: "insensitive"
+    //           },
+    //         },
+    //         {
+    //           content: {
+    //             contains: "dhaka",
+    //             mode: "insensitive"
+    //           },
+    //         },
+    //       ],
+    //     },
+    //     //? Filtering or Exact match
+    //     {
+    //       title: "dhaka",
+    //     },
+    //     {
+    //       content: "dhaka",
+    //     },
+    //   ],
+    // },
+
+//* skip = (page - 1) * limit
+    take: 1, // visiting page 1
+    // skip: 1, // visiting page 2
+    skip: 2, // visiting page 3
+
+
+    //? sorting
+    orderBy: {
+      createdAt: "desc",
+      title: "asc",
+      content: "desc",
     },
 
     include: {
