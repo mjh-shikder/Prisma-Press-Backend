@@ -15,27 +15,59 @@ const createPost = async (payload: ICreatePostPayload, userId: string) => {
 
 const getAllPosts = async () => {
   const posts = await prisma.post.findMany({
+
+    //? Filtering or Exact match 
     // where: {
     //   title: "My 4th Post",
     //   content: "Dhaka",
     // },
 
+    // where: {
+    //   AND: [
+    //     {
+    //       title: "My 4th Post"
+    //     },
+    //     {
+    //       // coontent: "Dhaka"
+    //     }, 
+    //     {
+    //       tags: {
+    //         equals: ["typescript", "prisma", "express"],
+    //       }
+    //     }
+    //   ]
+    // },
+    
+    //? Searching or Partial match
+
+    // where: {
+    //   title: {
+    //     contains: "dhaka",
+    //     mode: "insensitive"
+    //   },
+    //* Not Ideal for parital match. Partial match e por por 2 ta feild diya dile oy AND Operator er moto kaj korbe. So, better to use OR operator for partial match.
+      // content: {
+      //   contains: "dhaka",
+      //   mode: "insensitive"
+      // }
+    // },
+    
     where: {
-      AND: [
+      OR: [
         {
-          title: "My 4th Post"
+          title: {
+            contains: "dhaka",
+            mode: "insensitive"}
         },
         {
-          // coontent: "Dhaka"
-        }, 
-        {
-          tags: {
-            equals: ["typescript", "prisma", "express"],
+          content: {
+            contains: "dhaka",
+            mode: "insensitive"
           }
         }
       ]
     },
-
+    
     include: {
       author: {
         omit: {
