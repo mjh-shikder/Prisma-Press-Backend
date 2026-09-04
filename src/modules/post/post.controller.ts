@@ -24,6 +24,7 @@ const createPost = catchAsync(
 const getAllPosts = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
   const query = req.query;
+  // console.log(query);
 
     const result = await postService.getAllPosts(query);
 
