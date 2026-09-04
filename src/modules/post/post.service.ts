@@ -1,7 +1,11 @@
 import { title } from "node:process";
 import { CommentStatus, PostStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
-import { ICreatePostPayload, IUpdatePostPayload } from "./post.interface";
+import {
+  ICreatePostPayload,
+  IPostQuery,
+  IUpdatePostPayload,
+} from "./post.interface";
 
 const createPost = async (payload: ICreatePostPayload, userId: string) => {
   const result = await prisma.post.create({
@@ -14,7 +18,7 @@ const createPost = async (payload: ICreatePostPayload, userId: string) => {
   return result;
 };
 
-const getAllPosts = async () => {
+const getAllPosts = async (query: IPostQuery) => {
   const posts = await prisma.post.findMany({
     //? Filtering or Exact match
     // where: {
@@ -100,17 +104,45 @@ const getAllPosts = async () => {
     //   ],
     // },
 
-//* skip = (page - 1) * limit
-    take: 1, // visiting page 1
+    //* skip = (page - 1) * limit
+    // take: 1, // visiting page 1
     // skip: 1, // visiting page 2
-    skip: 2, // visiting page 3
-
+    // skip: 2, // visiting page 3
 
     //? sorting
-    orderBy: {
-      createdAt: "desc",
-      title: "asc",
-      content: "desc",
+    // orderBy: {
+    //   createdAt: "desc",
+    //   title: "asc",
+    //   content: "desc",
+    // },
+
+    where: {
+      AND: [
+        query.searchTerm
+          ? {
+              OR: [
+                {
+                  title: {
+                    contains: query.searchTerm,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  content: {
+                    contains: query.searchTerm,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            }
+          : {},
+
+        //* Title Filtering
+        query.title ? { title: query.title } : {},
+
+        //* Content Filtering
+        query.content ? { content: query.content } : {},
+      ],
     },
 
     include: {
