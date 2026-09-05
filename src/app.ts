@@ -1,14 +1,14 @@
 import cookieParser from "cookie-parser";
-import express, { Application, Request, Response } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
 import config from "./config";
-import { prisma } from "./lib/prisma";
-import httpStatus from "http-status";
-import bcrypt from "bcryptjs";
 import { userRouter } from "./modules/users/user.route";
 import { authRoutes } from "./modules/auth/auth.routes";
 import { postRoutes } from "./modules/post/post.route";
 import { commentRoutes } from "./modules/comment/comment.route";
+import { notFound } from "./middlewares/notFound";
+import httpStatus from "http-status";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 
 const app: Application = express();
 
@@ -33,5 +33,10 @@ app.use("/api/comments", commentRoutes);
 app.get("/", async (req: Request, res: Response) => {
   res.send("Hellow, workd");
 });
+
+
+app.use(notFound)
+
+app.use(globalErrorHandler);
 
 export default app;
