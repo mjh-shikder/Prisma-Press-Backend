@@ -30,7 +30,7 @@ app.use("/api/user", userRouter);
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
-app.use("api/subscription", subscriptionRoutes)
+app.use("/api/subscription", subscriptionRoutes)
 
 app.get("/", async (req: Request, res: Response) => {
   res.send("Hellow, workd");

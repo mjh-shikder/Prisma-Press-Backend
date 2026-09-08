@@ -8,9 +8,13 @@ import { jwtUtils } from "../../utils/jwt";
 const loginUser = async (payload: ILoginUser) => {
   const { email, password } = payload;
 
-  const user = await prisma.user.findUniqueOrThrow({
+  const user = await prisma.user.findUnique({
     where: { email },
   });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
 
   if (user.activeStatus === "BLOCKED") {
     throw new Error("Your account is blocked. Please contact support.");

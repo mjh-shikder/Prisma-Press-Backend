@@ -3,18 +3,16 @@ import { prisma } from "../../lib/prisma";
 import config from "../../config";
 import { RegisterUserPayload } from "./user.interface";
 
-
-
 const registerUserIntoDB = async (payload: RegisterUserPayload) => {
-    const { name, email, password, profilePhoto } = payload;
-      
-  const isUserExist = await prisma.user.findUniqueOrThrow({
+  const { name, email, password, profilePhoto } = payload;
+
+  const isUserExist = await prisma.user.findUnique({
     where: { email },
   });
 
-  // if (isUserExist) {
-  //   throw new Error("User wiht this email already exist");
-  // }
+  if (isUserExist) {
+    throw new Error("User with this email already exists");
+  }
 
   const hashedPassword = await bcrypt.hash(
     password,
@@ -28,9 +26,9 @@ const registerUserIntoDB = async (payload: RegisterUserPayload) => {
       password: hashedPassword,
       profile: {
         create: {
-          profilePhoto
-        }
-      }
+          profilePhoto,
+        },
+      },
     },
   });
 
@@ -53,23 +51,21 @@ const registerUserIntoDB = async (payload: RegisterUserPayload) => {
       profile: true,
     },
   });
-    
-    return user
-}
 
-
-const getMyProfileFromDB = async (userId: string) => {
-    const user = await prisma.user.findUniqueOrThrow({
-        where: { id: userId },
-        omit: { password: true, },
-        include: {
-            profile: true,
-        },
-    });
-
-    return user;
+  return user;
 };
 
+const getMyProfileFromDB = async (userId: string) => {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    omit: { password: true },
+    include: {
+      profile: true,
+    },
+  });
+
+  return user;
+};
 
 const updateMyProfileInDB = async (userId: string, payload: any) => {
   const { name, email, profilePhoto, bio } = payload;
@@ -79,27 +75,25 @@ const updateMyProfileInDB = async (userId: string, payload: any) => {
     data: {
       name,
       email,
-        profile: {
-      update: {
-        profilePhoto,
-        bio,
-      }
-    }
+      profile: {
+        update: {
+          profilePhoto,
+          bio,
+        },
+      },
     },
 
     omit: { password: true },
-  
+
     include: {
       profile: true,
     },
-  })
+  });
   return updatedUser;
-  }
-
-
+};
 
 export const userServcie = {
   registerUserIntoDB,
   getMyProfileFromDB,
-  updateMyProfileInDB
-}
+  updateMyProfileInDB,
+};

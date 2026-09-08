@@ -8,7 +8,7 @@ model Subscription {
     status SubscriptionStatus @default(ACTIVE)
 
     //stripe 
-    
+    stripeCustomerId String @unique
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
