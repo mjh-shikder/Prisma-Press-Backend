@@ -11,6 +11,7 @@ import httpStatus from "http-status";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 import { subscriptionRoutes } from "./modules/subscription/subscription.route";
 import { stripe } from "./lib/stripe";
+import { preiumRoutes } from "./modules/premium/premium.route";
 
 const app: Application = express();
 
@@ -95,6 +96,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/subscription", subscriptionRoutes);
+app.use("/api/premium", preiumRoutes);
+
 
 app.get("/", async (req: Request, res: Response) => {
   res.send("Hellow, workd");
