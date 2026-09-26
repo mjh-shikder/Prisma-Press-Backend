@@ -10,6 +10,19 @@ import { PostWhereInput } from "../../../generated/prisma/models";
 import { log } from "node:console";
 
 const createPost = async (payload: ICreatePostPayload, userId: string) => {
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId
+    },
+    include: {
+      subscription: true
+    }
+  })
+  
+  if (payload.isPremium && user.subscription?.status !== "ACTIVE") {
+    throw new Error ("you are not a premium user so you can not post premium content")
+  }
+
   const result = await prisma.post.create({
     data: {
       ...payload,
@@ -93,6 +106,10 @@ const getAllPosts = async (query: IPostQuery) => {
       status: query.status
     })
   }
+
+  andConditions.push({
+    isPremium: false
+  })
 
   const posts = await prisma.post.findMany({
     //? Filtering or Exact match
@@ -244,7 +261,21 @@ const getAllPosts = async (query: IPostQuery) => {
     },
   });
 
-  return posts;
+  const totalPostCount = await prisma.post.count({
+    where: {
+      AND: andConditions
+    }
+  })
+
+  return {
+    data: posts,
+    meta: {
+      page: page,
+      limit: limit,
+      total: totalPostCount,
+      totalPages: Math.ceil(totalPostCount/limit)
+    }
+  };
 };
 
 const getPostsById = async (postId: string) => {
@@ -305,6 +336,7 @@ const getPostsById = async (postId: string) => {
     const post = await tx.post.findUniqueOrThrow({
       where: {
         id: postId,
+        isPremium: false,
       },
       include: {
         author: {

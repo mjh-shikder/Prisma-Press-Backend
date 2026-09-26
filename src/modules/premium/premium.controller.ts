@@ -6,14 +6,16 @@ import HttpStatus from "http-status";
 
 
 const getPremiumContent = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    
-    const result = await premiumServices.getPremiumContent()
+  
+    const query = req.query
+    const result = await premiumServices.getPremiumContent(query)
     
     sendResponse(res, {
         success: true,
         statusCode: HttpStatus.OK,
         message: "Premium Content Retrived Successfully",
-        data: result
+        data: result.data,
+        meta: result.meta
     })
 
 })
